@@ -1,0 +1,105 @@
+ """Representa un nodo en la lista enlazada circular, que contiene una figura y su color fijo en la secuencia."""
+    def __init__(self, figura, color):
+        # Data fija para esta posición de la lista
+        self.data = {'figura': figura, 'color': color}
+        self.siguiente = None
+        self.anterior = None
+
+class Modelo:
+    """
+    Implementa la Lista Enlazada Circular para recorrer la secuencia Fija:
+    1. Círculo (Rojo)
+    2. Triángulo (Verde)
+    3. Cuadrado (Azul)
+    
+    Y luego, con el siguiente ciclo, aplicar la rotación de colores:
+    4. Círculo (Verde)
+    5. Triángulo (Azul)
+    6. Cuadrado (Rojo)
+    """
+    def __init__(self):
+        self.cabeza = None
+        self.actual = None
+        
+        # Secuencia base de figuras y colores
+        self.secuencia_base = [
+            {'figura': 'circulo', 'color': 'red'},
+            {'figura': 'triangulo', 'color': 'green'},
+            {'figura': 'cuadrado', 'color': 'blue'}
+        ]
+        
+        # Un contador que rastrea cuántas veces hemos rotado los colores (ciclos)
+        self.rotacion_ciclos = 0
+        
+        self._inicializar_lista_circular()
+        
+    def _inicializar_lista_circular(self):
+        """Crea la lista circular con la secuencia base de figuras."""
+        nodos = []
+        for item in self.secuencia_base:
+            nodo = Nodo(item['figura'], item['color'])
+            nodos.append(nodo)
+        
+        # Enlace circular bidireccional
+        for i in range(len(nodos)):
+            nodos[i].siguiente = nodos[(i + 1) % len(nodos)]
+            nodos[i].anterior = nodos[(i - 1) % len(nodos)]
+
+        self.cabeza = nodos[0]
+        self.actual = self.cabeza # El estado inicial es el Círculo Rojo
+
+    def _obtener_color_rotado(self, nodo):
+        """
+        Calcula el color que debe mostrarse para el nodo actual basado en la rotación_ciclos.
+        """
+        # Colores fijos en el orden: [Rojo, Verde, Azul]
+        colores_fijos = ['red', 'green', 'blue']
+        
+        # Encontramos el índice de la figura actual en la secuencia base
+        try:
+            indice_figura_base = next(
+                i for i, item in enumerate(self.secuencia_base) 
+                if item['figura'] == nodo.data['figura']
+            )
+        except StopIteration:
+            return 'black' # Fallback
+            
+        # El color a aplicar es el color base rotado por el número de ciclos
+        # (índice_figura_base + self.rotacion_ciclos) % len(colores_fijos)
+        indice_color = (indice_figura_base + self.rotacion_ciclos) % len(colores_fijos)
+        
+        return colores_fijos[indice_color]
+
+
+    def obtener_estado_actual(self):
+        """Retorna la figura actual y el color rotado que le corresponde."""
+        if self.actual:
+            figura = self.actual.data['figura']
+            color = self._obtener_color_rotado(self.actual)
+            return {'figura': figura, 'color': color}
+        return None
+
+    def avanzar(self):
+        """Mueve el puntero actual y verifica si se completa un ciclo para rotar los colores."""
+        if self.actual:
+            es_cabeza = (self.actual == self.cabeza)
+            
+            # 1. Mover al siguiente nodo (figura)
+            self.actual = self.actual.siguiente
+            
+            # 2. Si volvemos a la cabeza (Círculo), ¡rotamos el estado de color!
+            if self.actual == self.cabeza and not es_cabeza:
+                self.rotacion_ciclos = (self.rotacion_ciclos + 1) % len(self.secuencia_base)
+
+
+    def retroceder(self):
+        """Mueve el puntero anterior y ajusta la rotación de colores si es necesario."""
+        if self.actual:
+            # 1. Mover al nodo anterior (figura)
+            self.actual = self.actual.anterior
+            
+            # 2. Si retrocedemos a la cabeza (Círculo), significa que antes estábamos en el último nodo (Cuadrado),
+            # lo que implica que la rotación debe "retroceder" un ciclo.
+            if self.actual == self.cabeza:
+                # Usamos una rotación modular inversa para el retroceso
+                self.rotacion_ciclos = (self.rotacion_ciclos - 1 + len(self.secuencia_base)) % len(self.secuencia_base)
