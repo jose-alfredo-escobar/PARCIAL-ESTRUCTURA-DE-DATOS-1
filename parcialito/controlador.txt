@@ -1,21 +1,17 @@
 class Controlador:
-    """Maneja la lógica de la aplicación y actualiza la Vista y el Modelo."""
     def __init__(self, modelo, vista):
         self.modelo = modelo
         self.vista = vista
 
     def actualizar_vista(self):
-        """Obtiene el estado actual del Modelo y lo renderiza en la Vista."""
         estado = self.modelo.obtener_estado_actual()
         if estado:
             self.vista.mostrar_figura(estado['figura'], estado['color'])
 
     def mostrar_siguiente(self):
-        """Llama al método avanzar() del Modelo (que rota figura y colores) y actualiza la Vista."""
         self.modelo.avanzar()
         self.actualizar_vista()
 
     def mostrar_anterior(self):
-        """Llama al método retroceder() del Modelo (que rota figura y colores) y actualiza la Vista."""
         self.modelo.retroceder()
         self.actualizar_vista()
