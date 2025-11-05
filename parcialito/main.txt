@@ -4,22 +4,16 @@ from vista import Vista
 from controlador import Controlador
 
 if __name__ == "__main__":
-    # 1. Configuración de la Ventana Principal
     root = tk.Tk()
     root.title("MVC - Lista Circular")
 
-    # 2. Creación de Componentes
     model = Modelo()
     view = Vista(root)
     controller = Controlador(model, view)
 
-    # 3. Conexión de la Vista y el Modelo con el Controlador
-    # La Vista llama a los métodos del Controlador en los eventos de botón
     view.siguiente_btn.config(command=controller.mostrar_siguiente)
     view.anterior_btn.config(command=controller.mostrar_anterior)
 
-    # Iniciar la visualización inicial
     controller.actualizar_vista()
 
-    # 4. Iniciar el bucle principal de la aplicación
     root.mainloop()
